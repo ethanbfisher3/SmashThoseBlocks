@@ -1,0 +1,4 @@
+repository "Smash Those Blocks@chilerochapin@cloud"
+  path "/"
+    br "/main"
+    co "/main"
