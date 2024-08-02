@@ -19,6 +19,7 @@ namespace Environment
         public float dy = -0.2f;
 
         List<Block> enteredBlocks;
+        bool blocksPlaced = false;
 
         protected virtual void Start()
         {
@@ -30,8 +31,9 @@ namespace Environment
         {
             if (enteredBlocks.Count < requiredBlocks) return;
 
-            if (!BlocksMoving())
+            if (!BlocksMoving() && !blocksPlaced)
             {
+                blocksPlaced = true;
                 LeanTween.moveY(gameObject, transform.position.y + dy, 1f).setOnComplete(() =>
                 {
                     OnBlocksPlaced?.Invoke();

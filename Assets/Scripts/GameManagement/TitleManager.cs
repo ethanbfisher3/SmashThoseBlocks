@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Utils;
 using System.Collections;
+using Assets.Utils;
 
 namespace GameManagement
 {
@@ -21,6 +22,8 @@ namespace GameManagement
 
         void Awake()
         {
+            SaveSystem.LoadAllData();
+
             audioButton.onClick.AddListener(() =>
             {
                 if (AudioListener.volume == 0f)
@@ -35,10 +38,19 @@ namespace GameManagement
                 }
             });
 
+            bool shouldDisable = false;
             levelButtonsParent.transform.ForEachChild((child, index) =>
             {
                 var button = child.GetComponent<Button>();
                 button.onClick.AddListener(() => LoadLevel(index));
+
+                button.interactable = !shouldDisable;
+                if ((bool)SaveSystem.LoadData("level-" + index + "-completed", false))
+                {
+                    button.GetComponent<Image>().color = Color.green;
+                }
+                else shouldDisable = true;
+
             });
 
             playButton.onClick.AddListener(() =>
@@ -56,6 +68,14 @@ namespace GameManagement
             });
         }
 
+        void Start()
+        {
+            titleScreen.SetActive(true);
+            levelScreen.SetActive(false);
+            backButton.gameObject.SetActive(false);
+            loadSlider.gameObject.SetActive(false);
+        }
+
         void LoadLevel(int index)
         {
             loadSlider.gameObject.SetActive(true);
@@ -64,7 +84,7 @@ namespace GameManagement
             backButton.gameObject.SetActive(false);
             audioButton.gameObject.SetActive(false);
 
-            SaveSystem.SaveData(index, "level-to-load");
+            InterSceneInfo.Instance.LevelToLoad = index;
             StartCoroutine(LoadLevelAsync());
         }
 

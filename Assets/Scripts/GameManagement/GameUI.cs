@@ -13,10 +13,13 @@ namespace GameManagement
         public enum NotificationType { Normal, Warning, Error }
 
         public GameOption gameOptionPrefab;
+        public GameObject gameOptionParent;
         public Animator winPageAnimator;
+        public Animator exitPageAnimator;
         public Button selectPrevBlock;
         public Button selectNextBlock;
 
+        private bool exitPageOpened = false;
         List<GameOption> gameOptions;
 
         void Awake()
@@ -48,6 +51,21 @@ namespace GameManagement
                     }
                 }
             }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (!exitPageOpened)
+                {
+                    winPageAnimator.Play("In");
+                    GameManager.Instance.Pause();
+                }
+                else
+                {
+                    GameManager.Instance.UnPause();
+                    winPageAnimator.Play("Out");
+                }
+                exitPageOpened = !exitPageOpened;
+            }
         }
 
         void UpdateGameOptions()
@@ -55,12 +73,7 @@ namespace GameManagement
             for (int i = 0; i < gameOptions.Count; i++)
             {
                 RectTransform rt = gameOptions[i].GetComponent<RectTransform>();
-
-                // set pivot to the left side
-                rt.anchorMin = new Vector2(0f, 0.5f);
-                rt.anchorMax = new Vector2(0f, 0.5f);
-                rt.pivot = new Vector2(0.5f, 0.5f);
-                rt.position = new Vector2(rt.position.x, 400f - 75f * i);
+                rt.position = new Vector2(rt.position.x, rt.position.y - 125f * i);
             }
         }
 
@@ -87,7 +100,7 @@ namespace GameManagement
                 if (option.keyCode == code)
                     return;
 
-            GameOption go = Instantiate(gameOptionPrefab, transform);
+            GameOption go = Instantiate(gameOptionPrefab, gameOptionParent.transform);
 
             if (code != KeyCode.None)
                 go.image.sprite = GameOption.SpriteFromKeyCode(code);
@@ -126,5 +139,11 @@ namespace GameManagement
             winPageAnimator.Play("In");
         }
         public void CloseWinPage() => winPageAnimator.Play("Out");
+
+        public void OpenExitPage()
+        {
+            exitPageAnimator.gameObject.SetActive(true);
+            exitPageAnimator.Play("In");
+        }
     }
 }
