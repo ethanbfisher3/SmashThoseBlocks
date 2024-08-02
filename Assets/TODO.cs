@@ -8,6 +8,11 @@ make title page look nicer
 fix going between game scene and title page
 block info screen
 
+magnet block should have some ui
+timer on the levels, leaderboard
+
+images for the text on the gameoptions
+make the save system have one data file instead of multiple
 feather block doesn't work!
 
 Maybe:

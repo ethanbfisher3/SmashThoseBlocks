@@ -5,6 +5,7 @@ using Utils;
 using UnityEngine.Events;
 using Levels;
 using Blocks;
+using Assets.Utils;
 
 namespace GameManagement
 {
@@ -27,6 +28,8 @@ namespace GameManagement
 
         void Awake()
         {
+            SaveSystem.LoadAllData();
+
             Instance = this;
             OnLevelRestart = new UnityEvent();
         }
@@ -34,25 +37,31 @@ namespace GameManagement
         void Start()
         {
             IsAboutToWin = false;
-            if (startLevelIndex < 0)
-            {
-                int level = (int)SaveSystem.LoadData("level-to-load", 0);
-                LoadLevel(level);
-            }
-            else LoadLevel(startLevelIndex);
+            LoadLevel(InterSceneInfo.Instance.LevelToLoad);
         }
 
         public void Win()
         {
+            SaveSystem.SaveData(true, "level-" + GameLevel.Current.number + "-completed");
             AudioManager.Instance.Play("Win", pauseTheme: true);
             GameLevel.Current.OnLevelEnd?.Invoke();
             Playing = false;
             GameLevel.Current.blockHandler.DeselectBlock();
             GameUI.Instance.RemoveAllGameOptions();
             if (!Resources.Load($"Levels/Level{GameLevel.Current.number + 1}"))
-                LoadHomepage();
+            {
+                // game won
+                GameUI.Instance.OpenExitPage();
+            }
             else
                 GameUI.Instance.OpenWinPage();
+
+            SaveSystem.SaveAllData();
+        }
+
+        void OnDestroy()
+        {
+            SaveSystem.SaveAllData();
         }
 
         public void Pause()
@@ -82,7 +91,7 @@ namespace GameManagement
             IsAboutToWin = false;
             GameUI.Instance.RemoveAllGameOptions();
 
-            if (GameLevel.Current?.gameObject)
+            if (GameLevel.Current != null ? GameLevel.Current.gameObject : null)
                 Destroy(GameLevel.Current.gameObject);
 
             var level = Resources.Load<GameLevel>($"Levels/Level{index}");
@@ -97,6 +106,9 @@ namespace GameManagement
                     level.PlayCutScene();
                 }
                 else Playing = true;
+
+                prevBlockButton.gameObject.SetActive(GameLevel.Current.blockHandler.ChildBlocks.Length > 1);
+                nextBlockButton.gameObject.SetActive(GameLevel.Current.blockHandler.ChildBlocks.Length > 1);
             }
             else
                 LoadHomepage();

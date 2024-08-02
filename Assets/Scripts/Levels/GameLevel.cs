@@ -19,10 +19,8 @@ namespace Levels
         public LevelCompleter levelCompleter;
         public BlockHandler blockHandler;
         public Transform environment;
-        public Transform levelCenter;
         [Tooltip("The amount of time it takes to run the cutscene")]
         public float cutsceneSeconds = 5f;
-        public float cameraSizeAtLevelCenter;
         public bool shouldRecalculatePhysicsScene = true;
         public float physicsRecalculationTime = 2f;
         public int number;
@@ -106,6 +104,6 @@ namespace Levels
                 }
             }
         }
-    }
 #endif
+    }
 }

@@ -21,7 +21,6 @@ namespace Environment
 
         protected void OnCollisionEnter2D(Collision2D other)
         {
-            print("Entered Collision: " + other.gameObject.name);
             var block = other.gameObject.GetComponent<Block>();
             if (block.gameObject.name == "FlaggedBlock")
                 GameManager.Instance.IsAboutToWin = true;
